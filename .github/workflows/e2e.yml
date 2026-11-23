@@ -1,0 +1,120 @@
+# Reusable workflow: Playwright e2e tests of a Shiny extension R package, on the oldest supported Shiny and on the
+# latest. Call it from a job in the package's own workflow; see README.md for the caller snippet and check names.
+name: e2e
+
+on:
+  workflow_call:
+    inputs:
+      shiny-oldest:
+        description: >-
+          The oldest Shiny version to test, e.g. '1.7.5.1': the `shiny (>= x)` minimum in DESCRIPTION, or the oldest
+          version that installs on current R if DESCRIPTION has none.
+        required: true
+        type: string
+      working-directory:
+        description: The R package root, relative to the repository root. The tests are in its tests/e2e.
+        required: false
+        type: string
+        default: '.'
+      timeout-minutes:
+        description: Timeout of each leg, in minutes.
+        required: false
+        type: number
+        default: 10
+
+# A new push to a PR cancels its run still in progress. A started run on main is never cancelled, but GitHub keeps
+# only the newest queued run per group, so a queued main run can be replaced by a newer push. The group differs from
+# a caller's own `e2e-<ref>` group, so a caller with workflow-level concurrency doesn't wait for itself.
+concurrency:
+  group: shiny-e2e-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  e2e:
+    name: e2e (Shiny ${{ matrix.shiny }})
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    # A normal run takes 2-4 minutes. Stop early when the Ubuntu mirror stalls instead of using up minutes.
+    timeout-minutes: ${{ inputs.timeout-minutes }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        shiny: ['${{ inputs.shiny-oldest }}', 'latest']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # setup-r installs R through apt. Retry failed connections to the Ubuntu mirror instead of failing the job.
+      - name: Make apt retry
+        run: echo 'Acquire::Retries "3";' | sudo tee /etc/apt/apt.conf.d/80-retries
+
+      - name: Install R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      # Resolve "latest" once, from the repository the install uses, so the install and the version check below
+      # agree even while that repository lags behind a new Shiny release on CRAN.
+      - name: Resolve the Shiny version
+        id: shiny
+        shell: Rscript {0}
+        run: |
+          version <- "${{ matrix.shiny }}"
+          if (version == "latest") version <- available.packages()["shiny", "Version"]
+          cat("Shiny", version, "\n")
+          cat("version=", version, "\n", sep = "", file = Sys.getenv("GITHUB_OUTPUT"), append = TRUE)
+
+      # The Shiny pin is part of the same dependency solve, so the other packages fit that version.
+      - name: Install R package dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          working-directory: ${{ inputs.working-directory }}
+          dependencies: '"hard"'
+          # Config/Needs/e2e in DESCRIPTION: packages the e2e apps need beyond Imports.
+          needs: e2e
+          extra-packages: shiny@${{ steps.shiny.outputs.version }}
+          upgrade: ${{ matrix.shiny == 'latest' && 'TRUE' || 'FALSE' }}
+          cache-version: shiny-${{ matrix.shiny }}
+          # e2e runs no R Markdown or Quarto documents.
+          install-pandoc: false
+          install-quarto: false
+
+      - name: Check the Shiny version
+        shell: Rscript {0}
+        run: |
+          expected <- "${{ steps.shiny.outputs.version }}"
+          installed <- as.character(packageVersion("shiny"))
+          cat("Shiny", installed, "\n")
+          if (installed != expected) stop("Expected Shiny ", expected, ", got ", installed)
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ${{ inputs.working-directory }}/tests/e2e/package-lock.json
+
+      # No `playwright install`: in CI, defineShinyConfig() runs the tests in the runner's Google Chrome.
+      - name: Install test dependencies
+        working-directory: ${{ inputs.working-directory }}/tests/e2e
+        run: npm ci
+
+      - name: Run e2e tests
+        working-directory: ${{ inputs.working-directory }}/tests/e2e
+        run: npm test
+
+      - name: Upload report, traces and app logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-shiny-${{ matrix.shiny }}
+          path: |
+            ${{ inputs.working-directory }}/tests/e2e/playwright-report/
+            ${{ inputs.working-directory }}/tests/e2e/test-results/
+          retention-days: 14

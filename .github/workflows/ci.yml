@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  package:
+    name: Build and type-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            tests/fixture/tests/e2e/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm --prefix tests/fixture/tests/e2e ci
+
+      # dist/ is committed, so a git dependency needs no build step. It must match src/.
+      - name: Check that dist/ is built from src/
+        run: |
+          npm run build
+          git add --intent-to-add dist
+          git diff --exit-code -- dist
+
+      - name: Type-check the package and the fixture specs
+        run: npm run lint
+
+  # The reusable workflow, run against the fixture package in tests/fixture.
+  e2e:
+    uses: ./.github/workflows/e2e.yml
+    with:
+      working-directory: tests/fixture
+      shiny-oldest: '1.7.5.1'
