@@ -1,0 +1,38 @@
+{
+  "name": "@appsilon/shiny-e2e",
+  "version": "0.1.0",
+  "description": "Playwright fixtures and config for end-to-end tests of Shiny extension R packages.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Appsilon/shiny.e2e.git"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./global-setup": {
+      "types": "./dist/global-setup.d.ts",
+      "default": "./dist/global-setup.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsc",
+    "lint": "tsc --noEmit && tsc -p tests/fixture/tests/e2e"
+  },
+  "peerDependencies": {
+    "@playwright/test": "^1.64.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@types/node": "22.20.5",
+    "typescript": "6.0.3"
+  }
+}
