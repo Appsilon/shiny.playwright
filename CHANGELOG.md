@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0
+
+- **Breaking for required checks:** the reusable workflow's job is now named `Shiny <version>`, so a caller job
+  `e2e` gets the checks `e2e / Shiny latest` and `e2e / Shiny <shiny-oldest>` instead of `e2e / e2e (Shiny latest)`
+  and `e2e / e2e (Shiny <shiny-oldest>)`. Update the required checks in the repository's ruleset when upgrading.
+  The npm package is unchanged apart from its version.
+
 ## 0.1.0
 
 First release. The harness is extracted from the in-repo copies in shiny.i18n, shiny.router and shiny.fluent.

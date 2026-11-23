@@ -11,7 +11,7 @@ This repository has two parts, released together under one version tag:
 - **`.github/workflows/e2e.yml`**, a reusable GitHub workflow that runs those tests on the oldest supported Shiny
   version and on the latest.
 
-The package is installed from git (`github:Appsilon/shiny.playwright#v0.1.0`); it is not published to the npm registry.
+The package is installed from git (`github:Appsilon/shiny.playwright#v0.2.0`); it is not published to the npm registry.
 
 ## Adding e2e tests to a package
 
@@ -41,7 +41,7 @@ tests/e2e/
     "report": "playwright show-report"
   },
   "devDependencies": {
-    "@appsilon/shiny-playwright": "github:Appsilon/shiny.playwright#v0.1.0",
+    "@appsilon/shiny-playwright": "github:Appsilon/shiny.playwright#v0.2.0",
     "@playwright/test": "1.64.1",
     "@types/node": "22.20.5"
   }
@@ -126,7 +126,7 @@ permissions:
 
 jobs:
   e2e:
-    uses: Appsilon/shiny.playwright/.github/workflows/e2e.yml@v0.1.0
+    uses: Appsilon/shiny.playwright/.github/workflows/e2e.yml@v0.2.0
     with:
       shiny-oldest: '1.7.5.1'
 ```
@@ -137,11 +137,13 @@ is fine.
 **Check names.** GitHub prefixes the called workflow's job name with the caller's job name. With the caller job
 `e2e` above, the checks are:
 
-- `e2e / e2e (Shiny latest)`
-- `e2e / e2e (Shiny 1.7.5.1)` (the `shiny-oldest` value)
+- `e2e / Shiny latest`
+- `e2e / Shiny 1.7.5.1` (the `shiny-oldest` value)
 
-A repository moving from an inline e2e workflow, whose checks were `e2e (Shiny latest)` and
-`e2e (Shiny 1.7.5.1)`, must update the required checks in its ruleset to the new names.
+These are the names to require in the repository's ruleset. A repository moving from an inline e2e workflow, whose
+checks were `e2e (Shiny latest)` and `e2e (Shiny 1.7.5.1)`, must update its required checks to the new names. So
+must a repository on v0.1.0 of this workflow, whose checks were `e2e / e2e (Shiny latest)` and
+`e2e / e2e (Shiny 1.7.5.1)`.
 
 Call it once per caller workflow: two calls in the same workflow and ref share a concurrency group and artifact
 names.

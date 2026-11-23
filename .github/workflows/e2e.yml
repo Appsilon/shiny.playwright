@@ -31,7 +31,8 @@ concurrency:
 
 jobs:
   e2e:
-    name: e2e (Shiny ${{ matrix.shiny }})
+    # A caller job `e2e` gets the checks `e2e / Shiny latest` and `e2e / Shiny <shiny-oldest>`.
+    name: Shiny ${{ matrix.shiny }}
 
     runs-on: ubuntu-latest
 

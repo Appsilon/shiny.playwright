@@ -1,6 +1,6 @@
 {
   "name": "@appsilon/shiny-playwright",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Playwright fixtures and config for end-to-end tests of Shiny extension R packages.",
   "license": "MIT",
   "repository": {
