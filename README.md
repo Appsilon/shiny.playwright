@@ -1,17 +1,17 @@
-# shiny.e2e
+# shiny.playwright
 
 End-to-end tests for Shiny extension R packages, with [Playwright](https://playwright.dev). The tests start real
 Shiny apps that use the package **built from the current checkout** and drive them in Chromium.
 
 This repository has two parts, released together under one version tag:
 
-- **`@appsilon/shiny-e2e`**, an npm package: Playwright fixtures that install the package under test from source,
+- **`@appsilon/shiny-playwright`**, an npm package: Playwright fixtures that install the package under test from source,
   run each app in its own R process, wait for Shiny's busy/idle state, and check for app and browser errors. It
   also provides a config helper.
 - **`.github/workflows/e2e.yml`**, a reusable GitHub workflow that runs those tests on the oldest supported Shiny
   version and on the latest.
 
-The package is installed from git (`github:Appsilon/shiny.e2e#v0.1.0`); it is not published to the npm registry.
+The package is installed from git (`github:Appsilon/shiny.playwright#v0.1.0`); it is not published to the npm registry.
 
 ## Adding e2e tests to a package
 
@@ -41,7 +41,7 @@ tests/e2e/
     "report": "playwright show-report"
   },
   "devDependencies": {
-    "@appsilon/shiny-e2e": "github:Appsilon/shiny.e2e#v0.1.0",
+    "@appsilon/shiny-playwright": "github:Appsilon/shiny.playwright#v0.1.0",
     "@playwright/test": "1.64.1",
     "@types/node": "22.20.5"
   }
@@ -54,7 +54,7 @@ peer dependency (`^1.64.0`), so the repository pins its own version.
 ### `tests/e2e/playwright.config.ts`
 
 ```ts
-import { defineShinyConfig } from '@appsilon/shiny-e2e';
+import { defineShinyConfig } from '@appsilon/shiny-playwright';
 
 export default defineShinyConfig();
 ```
@@ -67,7 +67,7 @@ defaults, and `use` is merged key by key. A project named `chromium` is merged i
 key by key too), and projects with other names are added. For example, shiny.fluent:
 
 ```ts
-import { defineShinyConfig } from '@appsilon/shiny-e2e';
+import { defineShinyConfig } from '@appsilon/shiny-playwright';
 
 export default defineShinyConfig({
   use: {
@@ -84,7 +84,7 @@ export default defineShinyConfig({
 ### A spec
 
 ```ts
-import { expect, test } from '@appsilon/shiny-e2e';
+import { expect, test } from '@appsilon/shiny-playwright';
 
 test.use({ app: 'routing' }); // tests/e2e/apps/routing
 
@@ -126,7 +126,7 @@ permissions:
 
 jobs:
   e2e:
-    uses: Appsilon/shiny.e2e/.github/workflows/e2e.yml@v0.1.0
+    uses: Appsilon/shiny.playwright/.github/workflows/e2e.yml@v0.1.0
     with:
       shiny-oldest: '1.7.5.1'
 ```
@@ -226,8 +226,8 @@ To test another Shiny version, install it into a separate library and put that l
 
 shiny.i18n, shiny.router and shiny.fluent started with a copy of this harness in `tests/e2e/harness/`. To switch:
 
-1. Delete `tests/e2e/harness/` and add the `@appsilon/shiny-e2e` dependency (see above).
-2. In specs, import from `'@appsilon/shiny-e2e'` instead of `'../harness'`. Replace
+1. Delete `tests/e2e/harness/` and add the `@appsilon/shiny-playwright` dependency (see above).
+2. In specs, import from `'@appsilon/shiny-playwright'` instead of `'../harness'`. Replace
    `path.join(PKG_ROOT, 'inst', 'examples', 'x')` with `'inst/examples/x'`, and drop the `PKG_ROOT` and `node:path`
    imports if nothing else uses them.
 3. Replace `playwright.config.ts` with `defineShinyConfig()`, keeping only the repository's own `use` settings.
@@ -236,7 +236,7 @@ shiny.i18n, shiny.router and shiny.fluent started with a copy of this harness in
 ## Versions and upgrades
 
 Releases are git tags `vX.Y.Z`. The npm package and the workflow share the tag, so upgrade both together: the
-`github:Appsilon/shiny.e2e#vX.Y.Z` dependency (then `npm install` to update the lockfile) and the
+`github:Appsilon/shiny.playwright#vX.Y.Z` dependency (then `npm install` to update the lockfile) and the
 `uses: ...e2e.yml@vX.Y.Z` reference. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Developing this repository

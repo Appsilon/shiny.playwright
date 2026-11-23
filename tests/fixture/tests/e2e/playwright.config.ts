@@ -1,3 +1,3 @@
-import { defineShinyConfig } from '@appsilon/shiny-e2e';
+import { defineShinyConfig } from '@appsilon/shiny-playwright';
 
 export default defineShinyConfig();

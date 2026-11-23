@@ -1,4 +1,4 @@
-import { expect, test } from '@appsilon/shiny-e2e';
+import { expect, test } from '@appsilon/shiny-playwright';
 
 // Each test makes the app misbehave and checks that the harness reports it, with the reason.
 

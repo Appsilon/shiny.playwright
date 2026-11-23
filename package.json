@@ -1,11 +1,11 @@
 {
-  "name": "@appsilon/shiny-e2e",
+  "name": "@appsilon/shiny-playwright",
   "version": "0.1.0",
   "description": "Playwright fixtures and config for end-to-end tests of Shiny extension R packages.",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Appsilon/shiny.e2e.git"
+    "url": "git+https://github.com/Appsilon/shiny.playwright.git"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

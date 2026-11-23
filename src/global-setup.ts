@@ -13,7 +13,7 @@ import { packageRoot } from './paths';
  */
 export default function globalSetup(config: FullConfig) {
   const pkgRoot = packageRoot(config);
-  const lib = fs.mkdtempSync(path.join(os.tmpdir(), 'shiny-e2e-lib-'));
+  const lib = fs.mkdtempSync(path.join(os.tmpdir(), 'shiny-playwright-lib-'));
   // Workers inherit the runner's environment; shiny-app.ts reads it from there.
   process.env.E2E_LIB = lib;
 

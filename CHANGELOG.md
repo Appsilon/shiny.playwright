@@ -4,7 +4,7 @@
 
 First release. The harness is extracted from the in-repo copies in shiny.i18n, shiny.router and shiny.fluent.
 
-- npm package `@appsilon/shiny-e2e`: the `test` fixtures (`shiny`, the per-worker app pool, the `app` and
+- npm package `@appsilon/shiny-playwright`: the `test` fixtures (`shiny`, the per-worker app pool, the `app` and
   `ignoreConsoleErrors` options), `expect`, the `HarnessOptions` type, `defineShinyConfig()`, and the global setup
   that installs the package from source into a temporary library.
 - `app` also accepts a path relative to the package root (`'inst/examples/dashboard'`), so specs no longer need

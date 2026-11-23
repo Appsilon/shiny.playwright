@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { expect, test } from '@appsilon/shiny-e2e';
+import { expect, test } from '@appsilon/shiny-playwright';
 
 test.describe('an app under apps/ (bare name)', () => {
   test.use({ app: 'counter' });

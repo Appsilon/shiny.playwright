@@ -1,4 +1,4 @@
-import { test } from '@appsilon/shiny-e2e';
+import { test } from '@appsilon/shiny-playwright';
 
 // Expected failures (test.fail()): each test passes only if it fails. If the harness stopped reporting one of
 // these problems, the test would pass its body and be reported as "expected to fail, but passed".

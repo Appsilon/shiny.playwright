@@ -17,7 +17,7 @@ const paths_1 = require("./paths");
  */
 function globalSetup(config) {
     const pkgRoot = (0, paths_1.packageRoot)(config);
-    const lib = node_fs_1.default.mkdtempSync(node_path_1.default.join(node_os_1.default.tmpdir(), 'shiny-e2e-lib-'));
+    const lib = node_fs_1.default.mkdtempSync(node_path_1.default.join(node_os_1.default.tmpdir(), 'shiny-playwright-lib-'));
     // Workers inherit the runner's environment; shiny-app.ts reads it from there.
     process.env.E2E_LIB = lib;
     const started = Date.now();

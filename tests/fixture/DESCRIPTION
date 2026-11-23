@@ -1,9 +1,9 @@
 Package: e2efixture
-Title: Fixture Package for the shiny.e2e Tests
+Title: Fixture Package for the shiny.playwright Tests
 Version: 0.1.0
 Authors@R: person("Appsilon Sp. z o.o.", role = c("aut", "cre", "cph"), email = "opensource@appsilon.com")
 Description: A minimal Shiny extension package with a custom input binding. The
-    Playwright suite in tests/e2e uses it to test the shiny.e2e harness.
+    Playwright suite in tests/e2e uses it to test the shiny.playwright harness.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Imports:
