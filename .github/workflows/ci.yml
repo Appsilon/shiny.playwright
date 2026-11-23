@@ -39,7 +39,7 @@ jobs:
       # dist/ is committed, so a git dependency needs no build step. It must match src/.
       - name: Check that dist/ is built from src/
         run: |
-          npm run build
+          npm run build:dist
           git add --intent-to-add dist
           git diff --exit-code -- dist
 

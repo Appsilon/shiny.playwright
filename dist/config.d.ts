@@ -6,6 +6,7 @@ import type { HarnessOptions } from './index';
  * that uses Google Chrome when `CI` is set.
  *
  * `overrides` are merged with Playwright's `defineConfig()`: top-level keys replace the defaults, `use` is merged key
- * by key, and a project with the same name (`chromium`) replaces the default one.
+ * by key, a project named `chromium` is merged into the default one (its `use` key by key too), and projects with
+ * other names are added.
  */
 export declare function defineShinyConfig(overrides?: PlaywrightTestConfig<HarnessOptions>): PlaywrightTestConfig<HarnessOptions>;

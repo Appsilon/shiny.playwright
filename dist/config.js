@@ -8,7 +8,8 @@ const test_1 = require("@playwright/test");
  * that uses Google Chrome when `CI` is set.
  *
  * `overrides` are merged with Playwright's `defineConfig()`: top-level keys replace the defaults, `use` is merged key
- * by key, and a project with the same name (`chromium`) replaces the default one.
+ * by key, a project named `chromium` is merged into the default one (its `use` key by key too), and projects with
+ * other names are added.
  */
 function defineShinyConfig(overrides = {}) {
     return (0, test_1.defineConfig)({

@@ -63,8 +63,8 @@ export default defineShinyConfig();
 source; `fullyParallel`; `forbidOnly` when `CI` is set; `retries: 0`; the `list` and `html` reporters; traces and
 screenshots kept on failure; and one `chromium` project that uses Google Chrome (`channel: 'chrome'`) when `CI` is
 set. You can pass overrides, which are merged with Playwright's `defineConfig()`. Top-level keys replace the
-defaults, `use` is merged key by key, and a project named `chromium` replaces the default project. For example,
-shiny.fluent:
+defaults, and `use` is merged key by key. A project named `chromium` is merged into the default project (its `use`
+key by key too), and projects with other names are added. For example, shiny.fluent:
 
 ```ts
 import { defineShinyConfig } from '@appsilon/shiny-e2e';
@@ -143,6 +143,9 @@ is fine.
 A repository moving from an inline e2e workflow, whose checks were `e2e (Shiny latest)` and
 `e2e (Shiny 1.7.5.1)`, must update the required checks in its ruleset to the new names.
 
+Call it once per caller workflow: two calls in the same workflow and ref share a concurrency group and artifact
+names.
+
 Workflow inputs:
 
 | Input | Default | Meaning |
@@ -151,8 +154,8 @@ Workflow inputs:
 | `working-directory` | `.` | The R package root, relative to the repository root. The tests are in its `tests/e2e`. |
 | `timeout-minutes` | `10` | Timeout of each leg. |
 
-What a leg does: it installs R from Posit Package Manager. It resolves the Shiny version once (for `latest`, the
-newest version in that repository) and installs it in the same dependency solve as the package's hard dependencies
+What a leg does: it installs R and sets Posit Package Manager as the package repository. It resolves the Shiny
+version once (for `latest`, the newest version in that repository) and installs it in the same dependency solve as the package's hard dependencies
 and `Config/Needs/e2e`, with a separate R package cache per leg. It then checks that the installed Shiny is that
 version. Finally it runs `npm ci` and `npm test` in `tests/e2e`, with the npm cache keyed on
 `tests/e2e/package-lock.json`. On failure, it uploads the HTML report, traces and app logs as the artifact
@@ -191,7 +194,7 @@ How it works:
 - **Clean shutdown.** App processes are killed when the worker ends. If the runner is killed hard, the R process
   notices that its parent is gone and quits within about a second (Linux and macOS).
 - **Failure output.** When a test fails, its folder in `test-results/` has a screenshot, a trace, and `app.log` with
-  the app's R output.
+  the app's R output. If the app fails to start, there is no `app.log`: the error message includes the R output.
 
 ## Running locally
 
@@ -239,7 +242,8 @@ Releases are git tags `vX.Y.Z`. The npm package and the workflow share the tag, 
 ## Developing this repository
 
 `dist/` is committed: a git dependency then needs no build step at install time. After changing `src/`, run
-`npm run build` and commit `dist/`. CI fails if `dist/` does not match `src/`.
+`npm run build:dist` and commit `dist/`. (The script is not called `build`: npm
+would then install this repository's devDependencies whenever a consumer installs it from git.) CI fails if `dist/` does not match `src/`.
 
 `tests/fixture/` is a minimal R package (`e2efixture`) with a custom input binding and a Playwright suite in
 `tests/fixture/tests/e2e/` that tests the harness. That suite covers startup, the busy/idle waits, app and browser
@@ -247,9 +251,9 @@ errors, `ignoreConsoleErrors`, and expected failures (`specs/negative.spec.ts`).
 package from the working tree (`file:` with `install-links`):
 
 ```sh
-npm ci && npm run build && npm run lint
+npm ci && npm run build:dist && npm run lint
 cd tests/fixture/tests/e2e
-npm ci          # again after every `npm run build`, to pick up the new dist/
+npm ci          # again after every `npm run build:dist`, to pick up the new dist/
 CI=1 npm test
 ```
 
